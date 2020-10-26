@@ -1,23 +1,45 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import './app.css';
 import ReactImage from './react.png';
+import PriceTable from './components/PriceTable';
+
+function padPriceString(price) {
+    let priceString = price.toString();
+    if (!priceString.split('.')[1]) {
+        priceString += '00';
+    } else if (priceString.split('.')[1].length === 1) {
+        priceString += '0';
+    }
+
+    return priceString;
+}
+
+function processForTable(json) {
+    const tickerData = [];
+    for (let company in json.tickers) {
+        let obj = {};
+        obj['name'] = json.tickers[company].name;
+        obj['price'] = padPriceString(json.tickers[company].price);
+        obj['direction'] = json.tickers[company].percentChange > 0;
+        tickerData.push(obj);
+    }
+
+    return tickerData;
+}
 
 export default class App extends Component {
-  state = { tickers: [] };
+    constructor(props) {
+        super();
+        this.state = {
+            tickers: []
+        };
+    }
 
     componentDidMount() {
         fetch('/api/getTickers')
             .then(res => res.json())
             .then(data => {
-                const tickerData = [];
-                for (let company in data.tickers) {
-                    let obj = {};
-                    obj['name'] = company;
-                    obj['value'] = data.tickers[company];
-                    tickerData.push(obj);
-                }
-
-                this.setState({ tickers: tickerData });
+                this.setState({ tickers: processForTable(data) });
             });
     }
 
@@ -26,28 +48,19 @@ export default class App extends Component {
             fetch('/api/getTickers')
                 .then(res => res.json())
                 .then(data => {
-                    const tickerData = [];
-                    for (let company in data.tickers) {
-                        let obj = {};
-                        obj['name'] = company;
-                        obj['value'] = data.tickers[company];
-                        tickerData.push(obj);
-                    }
-
-                    this.setState({ tickers: tickerData });
+                    this.setState({ tickers: processForTable(data) });
                 });
+
         }, 1000);
     }
 
     render() {
         const { tickers } = this.state;
         return (
-            <div>
-                { tickers ? <h1>Today's stocks!</h1> : <h1>oops! something isn't working</h1> }
-                { tickers.map(ticker => <h2>{ticker.name.toUpperCase()}: ${ticker.value}</h2>) }
+            <div className="app-container">
+                { tickers ? <p className="page-header">Simple Robinhood</p> : <p className="page-header">oops! something isn't working</p> }
+                <PriceTable tickers={tickers} />
             </div>
         );
     }
 }
-
-// <img src={ReactImage} alt="react" />
