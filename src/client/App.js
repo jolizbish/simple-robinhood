@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import './app.css';
 import ReactImage from './react.png';
 import PriceTable from './components/PriceTable';
-import PriceGraph from './components/PriceGraph';
 
 function padPriceString(price) {
     let priceString = price.toString();
@@ -30,10 +29,11 @@ function processForTable(json) {
 
 export default class App extends Component {
     constructor(props) {
-      super();
-      this.state = {
-          tickers: []
-      };
+        super();
+        this.state = {
+            tickers: []
+        };
+    }
 
     componentDidMount() {
         fetch('/api/getTickers')
