@@ -15,4 +15,14 @@ app.use('/api/getTickers', proxy('localhost:8020', {
     }
 }));
 
+app.use('/api/getHistory', proxy('localhost:8020/history', {
+    proxyReqOptDecorator: function(proxyReqOpts, srcReq) {
+
+        return new Promise(function(resolve, reject) {
+            proxyReqOpts.headers['Content-Type'] = 'text/html';
+            resolve(proxyReqOpts);
+        })
+    }
+}));
+
 app.listen(process.env.PORT || 8080, () => console.log(`Listening on port ${process.env.PORT || 8080}!`));

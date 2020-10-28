@@ -10,6 +10,14 @@ const oldTickers = {
     ba: 167.42
 }
 
+const priceRecord = {
+    aapl: [],
+    sbux: [],
+    tsla: [],
+    pypl: [],
+    ba: []
+}
+
 function recalculateUnitPrice(oldPrice) {
     const direction = Math.round(Math.random()) === 1 ? 1 : -1;
     const magnitude = Math.random() / 20;
@@ -34,10 +42,25 @@ app.get('/', (req, res) => {
         obj['percentChange'] = calculatePercentChange(oldTickers[company], newPrice);
         obj['timestamp'] = new Date();
         newTickers.push(obj);
+
+        priceRecord[company].push({
+            timestamp: obj['timestamp'],
+            price: newPrice
+        });
+
+        console.log('priceRecord for', company, priceRecord[company]);
+
         oldTickers[company] = newPrice;
     }
 
     res.send({ tickers: newTickers });
+});
+
+app.get('/history', (req, res) => {
+    // res.send({ history: priceRecord[req.company], company: req.company });
+
+    console.log('MESSAGE RECEIVED');
+    res.send({ data: 'success!' });
 });
 
 
